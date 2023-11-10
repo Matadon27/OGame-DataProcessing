@@ -5,6 +5,7 @@
 // @description  Allows you to quickly and conveniently view all information about the player/alliance through the search by Name/ID/Coodinates gamer and Name/ID/Tag of the alliance respectively. Highlights activity on planets and moons
 // @author       Matadon27
 // @website      https://github.com/Matadon27
+// @license      Apache2.0
 // @match        *.ogame.gameforge.com/game/index.php*
 // ==/UserScript==
 
@@ -27,7 +28,12 @@ let fetchedPlayerData,
     fetchedAlliances,
     fetchedPlayersHighscores = [],
     fetchedAlliancesHighscores = [];
-let playerData = {}, universe = [], players = [], alliances = [], playersHighscores = [], alliancesHighscores = [];
+let playerData = {},
+    universe = [],
+    players = [],
+    alliances = [],
+    playersHighscores = [],
+    alliancesHighscores = [];
 
 getData(
     `https://s${universeId}-ru.ogame.gameforge.com/api/playerData.xml?id=${unsafeWindow.playerId}`
