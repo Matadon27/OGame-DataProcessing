@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         OGame DataProcessing
 // @namespace    http://tampermonkey.net/
-// @version      1.25.3
+// @version      1.25.4
 // @description  Allows you to quickly and conveniently view all information about the player/alliance through the search by Name/ID/Coodinates gamer and Name/ID/Tag of the alliance respectively. Highlights activity on planets and moons
 // @author       Matadon27
+// @website      https://github.com/Matadon27
 // @match        *.ogame.gameforge.com/game/index.php*
 // ==/UserScript==
 
@@ -34,7 +35,7 @@ let playerData = {},
     alliancesHighscores = [];
 
 getData(
-    `https://s${universeId}-ru.ogame.gameforge.com/api/playerData.xml?id=${window.playerId}`
+    `https://s${universeId}-ru.ogame.gameforge.com/api/playerData.xml?id=${unsafeWindow.playerId}`
 ).then((resp) => {
     fetchedPlayerData = resp;
 });
@@ -1132,7 +1133,7 @@ dataInpClrBtn.onclick = () => {
     clearResponseBlock();
 };
 
-document.onreadystatechange = () => {
+document.addEventListener('readystatechange', () => {
     // playerData <
     playerData.id = window.playerId;
     playerData.name = window.playerName;
@@ -1739,4 +1740,4 @@ document.onreadystatechange = () => {
             }
         }
     }
-};
+});
