@@ -27,12 +27,7 @@ let fetchedPlayerData,
     fetchedAlliances,
     fetchedPlayersHighscores = [],
     fetchedAlliancesHighscores = [];
-let playerData = {},
-    universe = [],
-    players = [],
-    alliances = [],
-    playersHighscores = [],
-    alliancesHighscores = [];
+let playerData = {}, universe = [], players = [], alliances = [], playersHighscores = [], alliancesHighscores = [];
 
 getData(
     `https://s${universeId}-ru.ogame.gameforge.com/api/playerData.xml?id=${unsafeWindow.playerId}`
