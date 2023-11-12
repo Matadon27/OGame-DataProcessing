@@ -104,11 +104,12 @@ function sendSpy(order, galaxy, system, planet, planettype, shipCount) {
     });
 }
 
-function fnCreateElement(tag, attributes = {}) {
+function fnCreateElement(tag, attributes = {}, content = null) {
     const elem = document.createElement(tag);
     if (Object.keys(attributes).length != 0) {
         for (let key in attributes) elem.setAttribute(key, attributes[key]);
     }
+    if (content) elem.innerText = content;
     return elem;
 }
 
@@ -914,13 +915,13 @@ const dataInput = fnCreateElement("input", {
     type: "text",
     autocomplete: "off",
 });
-const dataInpClrBtn = fnCreateElement("div", { id: "dataInpClrBtn" });
+const dataInpClrBtn = fnCreateElement("div", { id: "dataInpClrBtn" }, '+');
 const dataResponseBlock = fnCreateElement("div", { id: "dataResponseBlock" });
 const dataFooter = fnCreateElement("div", { id: "dataFooter" });
 const dataSetBut = fnCreateElement("div", { id: "dataSetBut" });
 const dataSetCloseBut = fnCreateElement("div", { id: "dataSetCloseBut" });
 const dataSettings = fnCreateElement("div", { id: "dataSettings" });
-const dataSProbeNumCap = fnCreateElement("p", { id: "dataSProbeNumCap" });
+const dataSProbeNumCap = fnCreateElement("p", { id: "dataSProbeNumCap" }, 'Количество зондов для шпионажа:');
 const dataSProbeNum = fnCreateElement("input", {
     id: "dataSProbeNum",
     type: "text",
@@ -946,7 +947,6 @@ let stopper = false;
 document.body.appendChild(dataPanelStyle);
 document.body.appendChild(dataWrapper);
 dataWrapper.appendChild(dataSettings);
-dataSProbeNumCap.innerText = "Количество зондов для шпионажа:";
 dataSettings.appendChild(dataSetCloseBut);
 dataSettings.appendChild(dataSProbeNumCap);
 dataSettings.appendChild(dataSProbeNum);
@@ -983,7 +983,6 @@ dataContentCaption.innerText =
     localStorage.getItem("currCapt") || "Имя/ID игрока/Координаты:";
 dataRequestBlock.appendChild(dataInput);
 dataRequestBlock.appendChild(dataInpClrBtn);
-dataInpClrBtn.innerText = "+";
 dataWrapper.appendChild(dataFooter);
 
 dataWrapper.style.left =
@@ -1354,7 +1353,7 @@ document.addEventListener('readystatechange', () => {
         clearResponseBlock();
         let u = [];
         for (let i in arr) {
-            u[i] = fnCreateElement("div", { class: "dataResponseLines" });
+            u[i] = fnCreateElement("div", { class: "dataResponseLines" }, arr[i]);
             let status = players.filter((player) => player.name == arr[i])[0]?.status;
             if (status) {
                 if (status.match(/a/)) u[i].style.color = "#f48406";
@@ -1363,7 +1362,7 @@ document.addEventListener('readystatechange', () => {
                 else if (status.match(/i/)) u[i].style.color = "#7e7e7e";
                 else if (status.match(/I/)) u[i].style.color = "#5f5f5f";
             }
-            u[i].innerText = arr[i];
+            // u[i].innerText = arr[i];
             u[i].onclick = (e) => {
                 dataInput.value = e.target.innerText;
                 if (dataRBPlayer.checked) {
