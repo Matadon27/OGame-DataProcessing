@@ -332,7 +332,7 @@ dataPanelStyle.innerHTML = `
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-height: ${window.innerHeight - 250}px;
+        max-height: calc(100vh - 250px);
         overflow-y: overlay;
     }
     .dataResponseLines {
@@ -928,10 +928,6 @@ const dataSProbeNum = fnCreateElement("input", {
     value: localStorage.getItem("probesToSpy"),
 });
 
-window.onresize = () => {
-    dataResponseBlock.style.maxHeight = window.innerHeight - 250 + "px";
-};
-
 if (localStorage.getItem("playerInputChecked") == null)
     localStorage.setItem("playerInputChecked", "true");
 else if (localStorage.getItem("playerInputChecked") == "true") {
@@ -1362,7 +1358,6 @@ document.addEventListener('readystatechange', () => {
                 else if (status.match(/i/)) u[i].style.color = "#7e7e7e";
                 else if (status.match(/I/)) u[i].style.color = "#5f5f5f";
             }
-            // u[i].innerText = arr[i];
             u[i].onclick = (e) => {
                 dataInput.value = e.target.innerText;
                 if (dataRBPlayer.checked) {
@@ -1427,13 +1422,11 @@ document.addEventListener('readystatechange', () => {
                 let allianceSign = fnCreateElement("div", {
                     id: "allianceSign",
                     style: "cursor: default; margin-right: 4px;",
-                });
+                }, "Альянс:");
                 let allianceName = fnCreateElement("div", {
                     id: "allianceName",
                     title: `ID: ${obj.alliance.id}\nТег: ${obj.alliance.tag}`,
-                });
-                allianceSign.textContent = "Альянс:";
-                allianceName.textContent = obj.alliance.name;
+                }, obj.alliance.name);
                 allianceName.onclick = (e) => {
                     dataRBAlliance.checked = true;
                     showAlliance(e);
