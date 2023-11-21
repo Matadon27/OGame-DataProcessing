@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         OGame DataProcessing
 // @namespace    http://tampermonkey.net/
-// @version      1.25.7
+// @version      1.25.8
 // @description  Allows you to quickly and conveniently view all information about the player/alliance through the search by Name/ID/Coodinates gamer and Name/ID/Tag of the alliance respectively. Highlights activity on planets and moons
 // @author       Matadon27
 // @website      https://github.com/Matadon27
@@ -65,42 +65,6 @@ for (let i = 0; i < 8; i++) {
         `https://s${universeId}-ru.ogame.gameforge.com/api/highscore.xml?category=2&type=${i}`
     ).then((resp) => {
         fetchedAlliancesHighscores[i] = resp.querySelectorAll("alliance");
-    });
-}
-
-function sendSpy(order, galaxy, system, planet, planettype, shipCount) {
-    let params = {
-        mission: order,
-        galaxy: galaxy,
-        system: system,
-        position: planet,
-        type: planettype,
-        shipCount: shipCount,
-        token: window.token,
-    };
-    window.$.ajax(window.miniFleetLink, {
-        data: params,
-        dataType: "json",
-        type: "POST",
-        success: function (data) {
-            window.token = data.newAjaxToken;
-            window.updateOverlayToken("phalanxSystemDialog", data.newAjaxToken);
-            window.updateOverlayToken("phalanxDialog", data.newAjaxToken);
-            if (data.response.success) {
-                window.fadeBox(
-                    data.response.message +
-                    " " +
-                    data.response.coordinates.galaxy +
-                    ":" +
-                    data.response.coordinates.system +
-                    ":" +
-                    data.response.coordinates.position,
-                    !data.response.success
-                );
-            } else {
-                window.fadeBox(data.response.message, true);
-            }
-        },
     });
 }
 
@@ -1506,12 +1470,12 @@ document.addEventListener('readystatechange', () => {
                         let cords;
                         let probeNum = +localStorage.getItem("probesToSpy");
                         cords = e.target.parentNode.nextSibling.innerText;
-                        sendSpy(
+                        sendShipsWithPopup(
                             6,
                             +cords.split(":")[0],
                             +cords.split(":")[1],
                             +cords.split(":")[2],
-                            1,
+                            0,
                             probeNum
                         );
                     };
@@ -1563,7 +1527,7 @@ document.addEventListener('readystatechange', () => {
                         let cords;
                         let probeNum = +localStorage.getItem("probesToSpy");
                         cords = e.target.parentNode.previousSibling.innerText;
-                        sendSpy(
+                        sendShipsWithPopup(
                             6,
                             +cords.split(":")[0],
                             +cords.split(":")[1],
