@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         OGame DataProcessing
 // @namespace    http://tampermonkey.net/
-// @version      1.25.9
+// @version      1.25.10
 // @description  Allows you to quickly and conveniently view all information about the player/alliance through the search by Name/ID/Coodinates gamer and Name/ID/Tag of the alliance respectively. Highlights activity on planets and moons
 // @author       Matadon27
 // @website      https://github.com/Matadon27
@@ -9,7 +9,11 @@
 // @match        *.ogame.gameforge.com/game/index.php*
 // ==/UserScript==
 
-if (window.frameElement) return false;
+function checkIfWindowIsFrame() {
+    if (window.frameElement) return false
+}
+
+checkIfWindowIsFrame();
 
 let opacityTimer;
 if (localStorage.getItem("probesToSpy") == null) localStorage.setItem("probesToSpy", "5");
@@ -18,8 +22,7 @@ let universeId = location.href.match(/s(\d{3})/)[1];
 async function getData(url) {
     const resp = await fetch(url);
     let text = await resp.text();
-    let parsed = new window.DOMParser().parseFromString(text, "text/xml");
-    return parsed;
+    return new window.DOMParser().parseFromString(text, "text/xml");
 }
 
 let fetchedPlayerData,
@@ -31,9 +34,9 @@ let fetchedPlayerData,
 let playerData = {},
     universe = [],
     players = [],
-    alliances = [],
-    playersHighscores = [],
-    alliancesHighscores = [];
+    alliances = []
+    // playersHighscores = [],
+    // alliancesHighscores = [];
 
 getData(
     `https://s${universeId}-ru.ogame.gameforge.com/api/playerData.xml?id=${unsafeWindow.playerId}`
@@ -70,7 +73,7 @@ for (let i = 0; i < 8; i++) {
 
 function fnCreateElement(tag, attributes = {}, content = null) {
     const elem = document.createElement(tag);
-    if (Object.keys(attributes).length != 0) {
+    if (Object.keys(attributes).length !== 0) {
         for (let key in attributes) elem.setAttribute(key, attributes[key]);
     }
     if (content) elem.innerText = content;
@@ -894,10 +897,10 @@ const dataSProbeNum = fnCreateElement("input", {
 
 if (localStorage.getItem("playerInputChecked") == null)
     localStorage.setItem("playerInputChecked", "true");
-else if (localStorage.getItem("playerInputChecked") == "true") {
+else if (localStorage.getItem("playerInputChecked") === "true") {
     dataRBPlayer.checked = true;
     dataRBAlliance.checked = false;
-} else if (localStorage.getItem("allianceInputChecked") == "true") {
+} else if (localStorage.getItem("allianceInputChecked") === "true") {
     dataRBAlliance.checked = true;
     dataRBPlayer.checked = false;
 }
@@ -1001,7 +1004,7 @@ dataSetCloseBut.onclick = (e) => {
 };
 
 dataSProbeNum.oninput = () => {
-    if (dataSProbeNum.value == "") dataSProbeNum.value = "1";
+    if (dataSProbeNum.value === "") dataSProbeNum.value = "1";
     dataSProbeNum.value = dataSProbeNum.value.replace(/\D/g, "");
     localStorage.setItem("probesToSpy", dataSProbeNum.value);
 };
@@ -1022,7 +1025,7 @@ iframeBlock.src = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?
 let flag = 0;
 dataIBTWeapons.onclick = () => {
     dataRBWeapons.checked = true;
-    if (flag == 0) {
+    if (flag === 0) {
         dataIBTPoints.style.opacity = 0;
         dataIBTEconomics.style.opacity = 0;
         dataIBTResearch.style.opacity = 0;
@@ -1041,7 +1044,7 @@ dataIBTWeapons.onclick = () => {
             dataIBTResearch.style.visibility = "hidden";
             flag = 1;
         }, 200);
-    } else if (flag == 1) {
+    } else if (flag === 1) {
         dataIconBoxType.style.left = "44px";
         dataIBTsCollected.style.transition = "opacity .2s .05s";
         dataIBTsCollected.style.opacity = 0;
@@ -1143,7 +1146,7 @@ document.addEventListener('readystatechange', () => {
             name: item.attributes.name.value,
             status: item.attributes.status && item.attributes.status.value,
             alliance: {},
-            planets: universe.filter((planet) => planet.player == item.id),
+            planets: universe.filter((planet) => planet.player === item.id),
         };
     });
     // > players
@@ -1154,7 +1157,7 @@ document.addEventListener('readystatechange', () => {
             name: item.attributes.name.value,
             tag: item.attributes.tag.value,
             founder: players.find(
-                (player) => player.id == item.attributes.founder.value
+                (player) => player.id === item.attributes.founder.value
             ),
             foundDate: new Date(+item.attributes.foundDate.value * 1000),
             players: [],
@@ -1163,7 +1166,7 @@ document.addEventListener('readystatechange', () => {
         };
         item.childNodes.forEach((elem) =>
             alliances[i].players.push(
-                ...players.filter((player) => player.id == elem.id)
+                ...players.filter((player) => player.id === elem.id)
             )
         ); // players for alliance
     });
@@ -1173,23 +1176,23 @@ document.addEventListener('readystatechange', () => {
     // > players highscores
     // linking data <
     playerData.alliance = alliances.filter(
-        (alliance) => alliance.id == fetchedPlayerData.querySelector("alliance")?.id
+        (alliance) => alliance.id === fetchedPlayerData.querySelector("alliance")?.id
     )[0];
     universe.forEach((planet) => {
         let tempPlrId = Array.from(fetchedUniverse).filter(
-            (elem) => elem.id == planet.id
+            (elem) => elem.id === planet.id
         )[0].attributes.player.value;
-        planet.player = players.filter((player) => player.id == tempPlrId)[0];
+        planet.player = players.filter((player) => player.id === tempPlrId)[0];
     });
     players.forEach((player) => {
         let currentAllianceId = Array.from(fetchedAlliances).filter(
             (alliance) =>
-                alliance.id ==
-                Array.from(alliance.childNodes).filter((plr) => plr.id == player.id)[0]
+                alliance.id ===
+                Array.from(alliance.childNodes).filter((plr) => plr.id === player.id)[0]
                     ?.parentNode.id
         )[0]?.id;
         player.alliance = alliances.filter(
-            (alliance) => alliance.id == currentAllianceId
+            (alliance) => alliance.id === currentAllianceId
         )[0];
     });
     // > linking data
@@ -1200,17 +1203,17 @@ document.addEventListener('readystatechange', () => {
 
     if (dataRBPlayer.checked) {
         dataInput.value = localStorage.getItem("playerInput");
-        if (localStorage.getItem("playerDataShown") == "true")
+        if (localStorage.getItem("playerDataShown") === "true")
             createLineDetails(
-                players.filter((player) => player.name == dataInput.value)[0],
+                players.filter((player) => player.name === dataInput.value)[0],
                 1
             );
         else fillSearchResult(players, 1);
     } else if (dataRBAlliance.checked) {
         dataInput.value = localStorage.getItem("allianceInput");
-        if (localStorage.getItem("allianceDataShown") == "true") {
+        if (localStorage.getItem("allianceDataShown") === "true") {
             let currentAlliance = alliances.filter(
-                (alliance) => alliance.name == dataInput.value
+                (alliance) => alliance.name === dataInput.value
             )[0];
             let currentPlayers = currentAlliance.players;
             let currentFounder = currentAlliance.founder.name;
@@ -1227,9 +1230,9 @@ document.addEventListener('readystatechange', () => {
         localStorage.setItem("allianceInputChecked", "false");
         dataInput.value = localStorage.getItem("playerInput");
         clearResponseBlock();
-        if (localStorage.getItem("playerDataShown") == "true") {
+        if (localStorage.getItem("playerDataShown") === "true") {
             createLineDetails(
-                players.filter((player) => player.name == dataInput.value)[0],
+                players.filter((player) => player.name === dataInput.value)[0],
                 1
             );
         }
@@ -1246,9 +1249,9 @@ document.addEventListener('readystatechange', () => {
         localStorage.setItem("playerInputChecked", "false");
         dataInput.value = localStorage.getItem("allianceInput");
         clearResponseBlock();
-        if (localStorage.getItem("allianceDataShown") == "true") {
+        if (localStorage.getItem("allianceDataShown") === "true") {
             let currentAlliance = alliances.filter(
-                (alliance) => alliance.name == dataInput.value
+                (alliance) => alliance.name === dataInput.value
             )[0];
             let currentPlayers = currentAlliance.players;
             let currentFounder = currentAlliance.founder.name;
@@ -1271,7 +1274,7 @@ document.addEventListener('readystatechange', () => {
 
     function fillSearchResult(data, mode) {
         let regExp = new RegExp(dataInput.value, "gi");
-        let cordsExp = /^(\d)[\s:\.](\d{1,3})[\s:\.]([1-9][0-6]*)$/;
+        let cordsExp = /^(\d)[\s:.](\d{1,3})[\s:.]([1-9][0-6]?)$/;
         let resArray = [];
         switch (mode) {
             case 1:
@@ -1283,11 +1286,11 @@ document.addEventListener('readystatechange', () => {
                     let currentCoords = `${dataInput.value.match(cordsExp)[1]}:${dataInput.value.match(cordsExp)[2]
                         }:${dataInput.value.match(cordsExp)[3]}`;
                     let currentPlayer = universe.filter(
-                        (planet) => planet.coords.raw == currentCoords
+                        (planet) => planet.coords.raw === currentCoords
                     )[0]?.player;
                     currentPlayer
                         ? resArray.push(
-                            data.filter((item) => item.id == currentPlayer.id)[0]?.name
+                            data.filter((item) => item.id === currentPlayer.id)[0]?.name
                         )
                         : (resArray = []);
                     createRespLines(resArray); // array of string
@@ -1314,7 +1317,7 @@ document.addEventListener('readystatechange', () => {
         let u = [];
         for (let i in arr) {
             u[i] = fnCreateElement("div", { class: "dataResponseLines" }, arr[i]);
-            let status = players.filter((player) => player.name == arr[i])[0]?.status;
+            let status = players.filter((player) => player.name === arr[i])[0]?.status;
             if (status) {
                 if (status.match(/a/)) u[i].style.color = "#f48406";
                 else if (status.match(/b/)) u[i].style.textDecoration = "line-through";
@@ -1329,14 +1332,14 @@ document.addEventListener('readystatechange', () => {
                     localStorage.setItem("playerDataShown", "true");
                     clearResponseBlock();
                     let currentPlayer = players.filter(
-                        (player) => player.name == e.target.innerText
+                        (player) => player.name === e.target.innerText
                     )[0];
                     createLineDetails(currentPlayer, 1);
                 } else if (dataRBAlliance.checked) {
                     localStorage.setItem("allianceInput", dataInput.value);
                     localStorage.setItem("allianceDataShown", "true");
                     let currentAlliance = alliances.filter(
-                        (alliance) => alliance.name == e.target.innerText
+                        (alliance) => alliance.name === e.target.innerText
                     )[0];
                     let currentPlayers = currentAlliance.players;
                     let currentFounder = currentAlliance.founder.name;
@@ -1344,7 +1347,7 @@ document.addEventListener('readystatechange', () => {
                     createLineDetails(currentAlliance, 2, currentPlayers, currentFounder);
                 }
             };
-            dataInput.value != ""
+            dataInput.value !== ""
                 ? dataResponseBlock.appendChild(u[i])
                 : clearResponseBlock();
         }
@@ -1359,7 +1362,7 @@ document.addEventListener('readystatechange', () => {
         localStorage.setItem("allianceInput", dataInput.value);
         localStorage.setItem("allianceDataShown", "true");
         let currentAlliance = alliances.filter(
-            (alliance) => alliance.name == handler.target.innerText
+            (alliance) => alliance.name === handler.target.innerText
         )[0];
         let currentPlayers = currentAlliance.players;
         let currentFounder = currentAlliance.founder.name;
@@ -1371,7 +1374,7 @@ document.addEventListener('readystatechange', () => {
         stopper = false;
         let bevel = fnCreateElement("div", { id: "bevel", class: "bevel" });
         dataResponseBlock.appendChild(bevel);
-        if (mode == 1) {
+        if (mode === 1) {
             let playerIdBlock = fnCreateElement("div", {
                 id: "playerIdBlock",
                 style: "cursor: default;",
@@ -1469,7 +1472,7 @@ document.addEventListener('readystatechange', () => {
                     pSpyBtn.onclick = (e) => {
                         let cords;
                         let probeNum = +localStorage.getItem("probesToSpy");
-                        cords = e.target.parentNode.nextSibling.innerText;
+                        cords = e.target.parentNode.nextSibling.textContent;
                         sendShipsWithPopup(
                             6,
                             +cords.split(":")[0],
@@ -1483,7 +1486,7 @@ document.addEventListener('readystatechange', () => {
                     pAtkBtn.title = "Атака";
                     pAtkBtn.onclick = (e) => {
                         let cords;
-                        cords = e.target.parentNode.nextSibling.innerText;
+                        cords = e.target.parentNode.nextSibling.textContent;
                         location.href = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=fleetdispatch&galaxy=${cords.split(":")[0]
                             }&system=${cords.split(":")[1]}&position=${cords.split(":")[2]
                             }&type=1&mission=1`;
@@ -1492,7 +1495,7 @@ document.addEventListener('readystatechange', () => {
                     pTrpBtn.title = "Транспорт";
                     pTrpBtn.onclick = (e) => {
                         let cords;
-                        cords = e.target.parentNode.nextSibling.innerText;
+                        cords = e.target.parentNode.nextSibling.textContent;
                         location.href = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=fleetdispatch&galaxy=${cords.split(":")[0]
                             }&system=${cords.split(":")[1]}&position=${cords.split(":")[2]
                             }&type=1&mission=3`;
@@ -1507,7 +1510,7 @@ document.addEventListener('readystatechange', () => {
                     mTrpBtn.title = pTrpBtn.title;
                     mTrpBtn.onclick = (e) => {
                         let cords;
-                        cords = e.target.parentNode.previousSibling.innerText;
+                        cords = e.target.parentNode.previousSibling.textContent;
                         location.href = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=fleetdispatch&galaxy=${cords.split(":")[0]
                             }&system=${cords.split(":")[1]}&position=${cords.split(":")[2]
                             }&type=3&mission=3`;
@@ -1516,7 +1519,7 @@ document.addEventListener('readystatechange', () => {
                     mAtkBtn.title = pAtkBtn.title;
                     mAtkBtn.onclick = (e) => {
                         let cords;
-                        cords = e.target.parentNode.previousSibling.innerText;
+                        cords = e.target.parentNode.previousSibling.textContent;
                         location.href = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=fleetdispatch&galaxy=${cords.split(":")[0]
                             }&system=${cords.split(":")[1]}&position=${cords.split(":")[2]
                             }&type=3&mission=1`;
@@ -1526,7 +1529,7 @@ document.addEventListener('readystatechange', () => {
                     mSpyBtn.onclick = (e) => {
                         let cords;
                         let probeNum = +localStorage.getItem("probesToSpy");
-                        cords = e.target.parentNode.previousSibling.innerText;
+                        cords = e.target.parentNode.previousSibling.textContent;
                         sendShipsWithPopup(
                             6,
                             +cords.split(":")[0],
@@ -1552,18 +1555,18 @@ document.addEventListener('readystatechange', () => {
                     pt[i].title = `Имя: ${planets[i].getAttribute("name")}\nID: ${planets[i].id
                         }`;
                     if (planets[i].hasChildNodes())
-                        mn[i].title = `Имя: ${planets[i].firstChild.getAttribute(
+                        mn[i].title = `Имя: ${planets[i].firstElementChild.getAttribute(
                             "name"
-                        )}\nID: ${planets[i].firstChild.id}\nДиаметр: ${planets[
+                        )}\nID: ${planets[i].firstElementChild.id}\nДиаметр: ${planets[
                             i
-                        ].firstChild.getAttribute("size")} км`;
+                        ].firstElementChild.getAttribute("size")} км`;
                     else mn[i].classList.add("noMoonIcon");
                     crd[i].onmouseup = (e) => {
                         e.stopPropagation();
-                        let url = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=galaxy&galaxy=${e.target.innerText.match(/^\d/)[0]
-                            }&system=${e.target.innerText.match(/:(\d{1,3}):/)[1]}`;
+                        let url = `https://s${universeId}-ru.ogame.gameforge.com/game/index.php?page=ingame&component=galaxy&galaxy=${e.target.textContent.match(/^\d/)[0]
+                            }&system=${e.target.textContent.match(/:(\d{1,3}):/)[1]}`;
                         if (e.metaKey || e.ctrlKey) window.open(url);
-                        else if (e.button == 0) location.href = url;
+                        else if (e.button === 0) location.href = url;
                     };
                     planetsBlock.appendChild(p[i]);
                 }
@@ -1579,7 +1582,6 @@ document.addEventListener('readystatechange', () => {
                 }
 
                 if (!window.frameElement) {
-                    let sysData;
                     for (let i = 0; i < p.length; i++) {
                         let galaxy = obj.planets[i].coords.gal;
                         let system = obj.planets[i].coords.sys;
@@ -1595,7 +1597,7 @@ document.addEventListener('readystatechange', () => {
                                 }
                             } else pt[i].classList.add("nowInactive");
                             let currentMoon = sysData[position - 1].planets.filter(
-                                (planet) => planet.planetType == 3
+                                (planet) => planet.planetType === 3
                             )[0];
                             if (currentMoon) {
                                 mn[i].classList.remove("noMoonIcon");
@@ -1612,7 +1614,7 @@ document.addEventListener('readystatechange', () => {
                     }
                 }
             });
-        } else if (mode == 2) {
+        } else if (mode === 2) {
             let allianceInfoBlock = fnCreateElement("div", {
                 id: "allianceInfoBlock",
             });
@@ -1629,8 +1631,8 @@ document.addEventListener('readystatechange', () => {
                 u[i] = fnCreateElement("div", { class: "dataPlayersList" });
                 let dataBlock = fnCreateElement("div", { class: "dataBlock" });
                 u[i].appendChild(dataBlock);
-                if (allys[i].name == founder) u[i].classList.add("alFounder");
-                let status = players.filter((player) => player.id == allys[i].id)[0]
+                if (allys[i].name === founder) u[i].classList.add("alFounder");
+                let status = players.filter((player) => player.id === allys[i].id)[0]
                     .status;
                 if (status) {
                     if (status.match(/a/)) dataBlock.style.color = "#f48406";
