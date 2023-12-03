@@ -3,8 +3,8 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.25.10
 // @description  Allows you to quickly and conveniently view all information about the player/alliance through the search by Name/ID/Coodinates gamer and Name/ID/Tag of the alliance respectively. Highlights activity on planets and moons
-// @author       Matadon27
-// @website      https://github.com/Matadon27
+// @author       mentor-27
+// @website      https://github.com/mentor-27
 // @license      Apache2.0
 // @match        *.ogame.gameforge.com/game/index.php*
 // ==/UserScript==
